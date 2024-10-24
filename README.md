@@ -113,7 +113,7 @@ You will find more detailed information about each of the tasks in the file [Det
 
 **As this challenge is part of a hackathon, participants are free to modify anything they need to implement their solution. There are no limits of any kind, neither technological nor visual.**
 
-**A [deployed website](https://nuwe.io) with all the functionalities to be created is provided so that participants have a clear reference of the expected performance.**
+**A [deployed website](https://react-personal-finance-assistant.vercel.app) with all the functionalities to be created is provided so that participants have a clear reference of the expected performance.**
 
 **It is possible to add as many functionalities as desired.**
 
