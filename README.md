@@ -17,8 +17,7 @@ Your role will be crucial in shaping the frontend of the platform, ensuring it i
 ## 📂 Repository Structure
 
 ```bash
-hackathon-caixabank-frontend-react-personalapp/ -> Nombre provisional
-react-personal-finance-assistant-incomplete/
+hackathon-caixabank-frontend-react-finassist/
 ├── Detailed_info.md
 ├── package.json
 ├── package-lock.json
@@ -121,14 +120,13 @@ You will find more detailed information about each of the tasks in the file [Det
 **The code provides a basis on which to work, and also contains comments that may be useful.**
 
 
-
 ### Correction
 
 The correction will be done manually.
 
 Therefore, standards will have to be applied:
 - The execution will have to be: `npm i`, `npm start`. Any project that does not work properly when running these commands will not score.
-- To evaluate the purpose of the tests `npm test` will be run. If it does not work, this target will be scored as 0.
+- To evaluate the purpose of the tests `npm test` will be run. If it does not work, this task will be scored as 0.
 - A small part of the score will be all visual. In this case the overall look and feel of the application will be evaluated, giving an extra score of 100 points.
 - By default the version of Node that will be used is **Node 20(LTS)**.
 
