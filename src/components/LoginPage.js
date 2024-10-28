@@ -13,11 +13,11 @@ function LoginPage() {
     const navigate = useNavigate();
 
     const handleLogin = (e) => {
-        e.preventDefault(); // Debe ser la primera línea para prevenir el comportamiento predeterminado
+        e.preventDefault(); 
    
     
 
-        // Validación de campos
+      
         if (!email || !password) {
             setError('Please fill in both fields.');
             return;
@@ -41,9 +41,9 @@ function LoginPage() {
     };
     
     const handleRegister = () => {
-        // Aquí puedes manejar el registro o redirigir a una página de registro
+      
         navigate('/register');
-        // Por ejemplo, puedes usar navigate('/register') si tienes una página de registro
+      
     }; 
 
     const handleLoginForgot = () => { 
@@ -102,7 +102,7 @@ function LoginPage() {
             {error && (
                 <>
                     <Button
-                        onClick={handleForgotPassword} // Corregido para pasar la referencia
+                        onClick={handleForgotPassword} 
                         variant="outlined"
                         color="primary"
                         fullWidth
@@ -111,7 +111,7 @@ function LoginPage() {
                         Forgot Password?
                     </Button>
                     <Button
-                        onClick={handleRegister} // Corregido para pasar la referencia
+                        onClick={handleRegister}
                         variant="outlined"
                         color="primary"
                         fullWidth

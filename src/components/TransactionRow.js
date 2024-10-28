@@ -3,11 +3,11 @@ import { TableRow, TableCell, Button } from '@mui/material';
 
 function TransactionRow({ transaction, onEdit, onDelete }) {
     const handleEdit = () => {
-        onEdit(transaction); // Llama a la función onEdit con la transacción actual
+        onEdit(transaction); 
     };
 
     const handleDelete = () => {
-        // Llama a la función onDelete con la ID de la transacción actual
+        
         const confirmDelete = window.confirm('Are you sure you want to delete this transaction?');
         if (confirmDelete) {
             onDelete(transaction.id);
