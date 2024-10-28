@@ -55,6 +55,21 @@ npm start
 
 Visit http://localhost:3000 to explore the app.
 
+## Pictures 
+# Desktop View 
+
+
+![captura mac finance app](https://github.com/user-attachments/assets/51b54407-dbc0-4afb-8fe7-30eb6dafe23a)
+
+
+# Mobile View
+
+
+![captura iphone finance app](https://github.com/user-attachments/assets/f3acc0e2-4cd9-4016-aa1a-ebe5db59d3a6)
+
+
+
+
 🌟 Contributing
 Contributions are welcome! Feel free to open issues or submit pull requests for any improvements or new features.
 
