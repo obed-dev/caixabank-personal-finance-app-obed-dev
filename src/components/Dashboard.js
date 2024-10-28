@@ -1,6 +1,6 @@
 import React, { Profiler } from 'react';
 import { useStore } from '@nanostores/react';
-import { Box, Typography, Grid, Paper } from '@mui/material';
+import { Box, Typography, Grid, Paper, Alert } from '@mui/material';
 import ExportButton from './ExportButton';
 import DownloadProfilerData from './DownloadProfilerData';
 import { onRenderCallback } from '../utils/onRenderCallback';
@@ -16,10 +16,20 @@ const RecentTransactions = React.lazy(() => import('./RecentTransactions'));
 function Dashboard() {
     const transactions = useStore(transactionsStore);
 
-    // Replace the placeholder values with calculations for total income, total expenses, and balance.
-    const totalIncome = 0; // Calculate total income from transactions
-    const totalExpense = 0; // Calculate total expenses from transactions
-    const balance = 0; // Calculate balance based on total income and expenses
+    // Calculate total income, total expenses, and balance
+    const totalIncome = transactions.reduce((acc, transaction) => {
+        return transaction.type === 'income' ? acc + transaction.amount : acc;
+    }, 0);
+
+    const totalExpense = transactions.reduce((acc, transaction) => {
+        return transaction.type === 'expense' ? acc + transaction.amount : acc;
+    }, 0);
+
+    const balance = totalIncome - totalExpense;
+
+    // Warning and budget limit logic (example values)
+    const budgetLimit = 1000; // Set a budget limit
+    const budgetExceeded = balance < 0 || totalExpense > budgetLimit;
 
     return (
         <Profiler id="Dashboard" onRender={onRenderCallback}>
@@ -29,11 +39,10 @@ function Dashboard() {
                 </Typography>
 
                 {/* Action Buttons Section */}
-                {/* Instructions:
-                    - Add a section with ExportButton and DownloadProfilerData components.
-                    - The ExportButton should export the transaction data as a CSV file.
-                    - The DownloadProfilerData button should export profiler data in JSON format.
-                */}
+                <Box sx={{ mb: 4 }}>
+                    <ExportButton />
+                    <DownloadProfilerData />
+                </Box>
 
                 {/* Totals Section */}
                 <Grid container spacing={4} sx={{ mt: 4 }}>
@@ -43,7 +52,7 @@ function Dashboard() {
                                 Total Income
                             </Typography>
                             <Typography variant="h5" data-testid="total-income">
-                                {/* Show total income */}
+                                {totalIncome.toFixed(2)} {/* Show total income */}
                             </Typography>
                         </Paper>
                     </Grid>
@@ -53,7 +62,7 @@ function Dashboard() {
                                 Total Expenses
                             </Typography>
                             <Typography variant="h5" data-testid="total-expenses">
-                                {/* Show total expenses */}
+                                {totalExpense.toFixed(2)} {/* Show total expenses */}
                             </Typography>
                         </Paper>
                     </Grid>
@@ -63,33 +72,54 @@ function Dashboard() {
                                 Balance
                             </Typography>
                             <Typography variant="h5" data-testid="balance">
-                                {/* Show the balance */}
+                                {balance.toFixed(2)} {/* Show the balance */}
                             </Typography>
-                            {/* Instructions:
-                                - If the balance is negative, show a warning message.
-                                - Display a message or alert if the budget limit has been exceeded.
-                            */}
+                            {balance < 0 && (
+                                <Alert severity="warning">Your balance is negative!</Alert>
+                            )}
+                            {budgetExceeded && (
+                                <Alert severity="error">Budget limit exceeded!</Alert>
+                            )}
                         </Paper>
                     </Grid>
                 </Grid>
 
                 {/* Statistics and Recommendations Section */}
-                {/* Instructions:
-                    - Use the `Statistics` component to show key financial metrics.
-                    - Use the `Recommendations` component to display financial advice.
-                */}
+                <Grid container spacing={4} sx={{ mt: 4 }}>
+                    <Grid item xs={12} md={6}>
+                        <React.Suspense fallback={<div>Loading statistics...</div>}>
+                            <Statistics />
+                        </React.Suspense>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <React.Suspense fallback={<div>Loading recommendations...</div>}>
+                            <Recommendations />
+                        </React.Suspense>
+                    </Grid>
+                </Grid>
 
                 {/* Charts Section */}
-                {/* Instructions:
-                    - Use the `AnalysisGraph` component to show a breakdown of income and expenses by category.
-                    - Use the `BalanceOverTime` component to show the user's balance over time.
-                */}
+                <Grid container spacing={4} sx={{ mt: 4 }}>
+                    <Grid item xs={12}>
+                        <React.Suspense fallback={<div>Loading analysis graph...</div>}>
+                            <AnalysisGraph />
+                        </React.Suspense>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <React.Suspense fallback={<div>Loading balance over time...</div>}>
+                            <BalanceOverTime />
+                        </React.Suspense>
+                    </Grid>
+                </Grid>
 
                 {/* Recent Transactions Section */}
-                {/* Instructions:
-                    - Display a list or table of recent transactions using the `RecentTransactions` component.
-                    - Ensure that each transaction shows key details such as description, amount, type, and date.
-                */}
+                <Grid container spacing={4} sx={{ mt: 4 }}>
+                    <Grid item xs={12}>
+                        <React.Suspense fallback={<div>Loading recent transactions...</div>}>
+                            <RecentTransactions />
+                        </React.Suspense>
+                    </Grid>
+                </Grid>
             </Box>
         </Profiler>
     );
