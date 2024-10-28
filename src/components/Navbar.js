@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge, Avatar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Link } from 'react-router-dom';
 
-const Navbar = ({ toggleTheme, isDarkMode }) => {
+const Navbar = ({ toggleTheme, isDarkMode, user, onLogout }) => {
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const toggleDrawer = (open) => (event) => {
@@ -23,34 +23,67 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
                     </IconButton>
 
                     {/* Navigation links */}
-                    {/* Instructions:
-                        - Implement navigation links for authenticated and unauthenticated users.
-                        - If the user is authenticated, show links like "Dashboard", "Settings", and a "Logout" button.
-                        - If the user is not authenticated, show "Login" and "Register" links. 
-                        - Use the `Link` component from `react-router-dom`. */}
-                    <Box>
+                    <Box sx={{ flexGrow: 1 }}>
+                        {user ? (
+                            <Box sx={{ display: 'flex', alignItems: 'left' }}>
+                                <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                    Dashboard
+                                </Link>
+                                <Link to="/settings" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                    Settings
+                                </Link>
+                                <Button color="inherit" onClick={onLogout}>Logout</Button>
+                                {/* User avatar */}
+                                <IconButton>
+                                    <Avatar alt={user.email} src={user.avatar} />
+                                </IconButton>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Link to="/login" style={{ textDecoration: 'none', color: 'inherit', marginRight: 20 }}>
+                                    Login
+                                </Link>
+                                <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    Register
+                                </Link>
+                            </Box>
+                        )}
                         <IconButton>
                             <Badge color="error" variant="dot">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
-
-                        {/* User avatar */}
-                        {/* Instructions:
-                            - Display the user's avatar if they are logged in.
-                            - Use an Avatar component and display the user's email as a tooltip or alt text. */}
                     </Box>
                 </Toolbar>
             </AppBar>
 
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-                <Box>
+                <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
                     {/* Drawer navigation links */}
-                    {/* Instructions:
-                        - Display navigation links inside the drawer.
-                        - Links should be based on the user's authentication status.
-                        - For example, show links like "Dashboard", "Transactions", "Settings" if authenticated.
-                        - Use the `Link` component from `react-router-dom`. */}
+                    {user ? (
+                        <Box sx={{ padding: 2 }}>
+                            <Typography variant="h6">Navigation</Typography>
+                            <Link to="/dashboard" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                Dashboard
+                            </Link>
+                            <Link to="/transactions" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                Transactions
+                            </Link>
+                            <Link to="/settings" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                Settings
+                            </Link>
+                        </Box>
+                    ) : (
+                        <Box sx={{ padding: 2 }}>
+                            <Typography variant="h6">Navigation</Typography>
+                            <Link to="/login" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                Login
+                            </Link>
+                            <Link to="/register" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                Register
+                            </Link>
+                        </Box>
+                    )}
                 </Box>
             </Drawer>
         </>

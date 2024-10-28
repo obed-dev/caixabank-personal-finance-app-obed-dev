@@ -1,20 +1,34 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
-import { profilerData } from '../utils/profilerData';
+import PropTypes from 'prop-types';
 
-function DownloadProfilerData() {
+function DownloadProfilerData({ profilerData }) {
     // Handle download functionality
     const handleDownload = () => {
         if (profilerData.length === 0) {
-            // - First, check if there is any profiler data available.
-            // - If there is no data, alert the user that there is nothing to download.
+            // Alert the user that there is nothing to download
+            alert('No profiler data available for download.');
             return;
         }
 
-        // - If data is available, convert the data to a JSON format.
-        // - Create a Blob from the JSON string and generate a URL for the Blob.
-        // - Create a temporary link element to trigger the download.
+        // Convert the data to JSON format
+        const jsonString = JSON.stringify(profilerData, null, 2);
+        // Create a Blob from the JSON string
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        // Generate a URL for the Blob
+        const url = URL.createObjectURL(blob);
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'profilerData.json'; // Set the download file name
+        // Append link to the body
+        document.body.appendChild(link);
+        // Trigger the download
+        link.click();
+        // Clean up and remove the link
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Release the Blob URL
     };
 
     return (
@@ -28,5 +42,10 @@ function DownloadProfilerData() {
         </Button>
     );
 }
+
+// Define PropTypes for better verification
+DownloadProfilerData.propTypes = {
+    profilerData: PropTypes.array.isRequired,
+};
 
 export default DownloadProfilerData;

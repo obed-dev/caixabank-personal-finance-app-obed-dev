@@ -6,18 +6,37 @@ import PropTypes from 'prop-types';
 const ExportButton = React.memo(function ExportButton({ data, filename, headers, label }) {
     const handleExport = useCallback(() => {
         // Convert data to CSV format
-        // Instructions:
-        // - Use the convertArrayOfObjectsToCSV function to convert the data array to a CSV string.
-        // - Create a Blob object with CSV content
-        // - Create a temporary link to download the file
+        const csv = convertArrayOfObjectsToCSV(data, headers);
+        if (!csv) return;
+
+        // Create a Blob object with CSV content
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        // Create a temporary link to download the file
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link); // Append to the DOM
+        link.click(); // Trigger download
+        document.body.removeChild(link); // Clean up
     }, [data, filename, headers]);
 
     // Function to convert object array to CSV
-    // Instructions:
-    // - Implement logic to convert an array of objects into a CSV string.
-    // - Ensure the headers are used to extract the correct fields from each object in the data array.
-    const convertArrayOfObjectsToCSV = () => {
-        // Implement the conversion logic here
+    const convertArrayOfObjectsToCSV = (dataArray, headersArray) => {
+        if (!dataArray.length) return null;
+
+        // Create header row
+        const headerRow = headersArray.join(',') + '\n';
+
+        // Create data rows
+        const rows = dataArray.map(obj => 
+            headersArray.map(header => {
+                const value = obj[header] !== undefined ? obj[header] : '';
+                return `"${value}"`; // Wrap values in quotes
+            }).join(',')
+        ).join('\n');
+
+        return headerRow + rows;
     };
 
     return (

@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
+import ExportButton from './ExportButton'; 
+import DownloadProfilerData from './DownloadProfilerData';
 import { transactionsStore, deleteTransaction as deleteTransactionAction } from '../stores/transactionStore'; 
 import TransactionForm from './TransactionForm';
 import {
@@ -21,7 +23,8 @@ import {
 
 function TransactionList() {
     const transactions = useStore(transactionsStore);
-
+    const [showForm, setShowForm] = useState(false);
+    const [profilerData, setProfilerData] = useState([]);
     const [filterCategory, setFilterCategory] = useState('');
     const [filterType, setFilterType] = useState('');
     const [sortField, setSortField] = useState('');
@@ -45,11 +48,12 @@ function TransactionList() {
         setIsFormOpen(true);
     }, []);
 
-    // Handle adding a new transaction
-    const handleAddTransaction = () => {
-        setTransactionToEdit(null);
-        setIsFormOpen(true);
+    
+    const handleTransactionAdded = () => {
+        setShowForm(false);
     };
+    
+
 
     // Filter transactions based on category and type
     const filteredTransactions = useMemo(() => {
@@ -74,12 +78,29 @@ function TransactionList() {
                 Transaction List
             </Typography>
 
-            {/* Add transaction button */}
-            <Button variant="contained" color="primary" onClick={handleAddTransaction}>
+           
+            <Button variant="contained" color="primary" onClick={() => setShowForm(true)}>
                 Add Transaction
             </Button>
 
-            {/* Filters */}
+            
+            {showForm && (
+                <TransactionForm onClose={() => setShowForm(false)} onTransactionAdded={handleTransactionAdded} />
+            )}
+
+           
+            {transactions.length > 0 && (
+                <ExportButton
+                    data={transactions}
+                    filename="transactions.csv"
+                    headers={['description', 'amount', 'type', 'category', 'date']}
+                    label="Export Transactions"
+                />
+            )}
+                        {profilerData.length > 0 && (
+                <DownloadProfilerData profilerData={profilerData} />
+            )}
+            
             <Box sx={{ display: 'flex', gap: 2, my: 2 }}>
                 <FormControl sx={{ minWidth: 120 }}>
                     <InputLabel id="filter-category-label">Category</InputLabel>
@@ -89,7 +110,7 @@ function TransactionList() {
                         onChange={(e) => setFilterCategory(e.target.value)}
                     >
                         <MenuItem value="">All</MenuItem>
-                        {/* Add additional categories dynamically here */}
+                      
                     </Select>
                 </FormControl>
 
