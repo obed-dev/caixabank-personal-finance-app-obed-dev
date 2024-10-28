@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { userSettingsStore } from '../stores/userSettingsStore';
-import { budgetAlertStore, updateBudgetAlert } from '../stores/budgetAlertStore'; // Importar el store de alertas
+import { budgetStore, setBudget } from '../stores/budgetAlertStore'; // Importar el store de alertas
 import {
     Box,
     Typography,
@@ -20,22 +20,44 @@ function Settings() {
     const userSettings = useStore(userSettingsStore);
     const transactions = useStore(transactionsStore);
 
+    const [alertsEnabled, setAlertsEnabled] = useState(userSettings.alertsEnabled);
     const [budgetExceeded, setBudgetExceeded] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [error, setError] = useState('');
     const [totalBudgetLimit, setTotalBudgetLimit] = useState(userSettings.totalBudgetLimit);
+    const [categoryLimits, setCategoryLimits] = useState({});
 
+    // Initialize category limits based on expense categories
+    useEffect(() => {
+        const initialLimits = expenseCategories.reduce((acc, category) => {
+            acc[category] = userSettings.categoryLimits[category] || 0;
+            return acc;
+        }, {});
+        setCategoryLimits(initialLimits);
+    }, [userSettings]);
 
     const handleSave = () => {
-        // Instructions:
-        // - Validate the total category limits.
-        // - If the total category limits exceed the total budget limit, set an error message.
-        // - If validation passes, clear the error message and save the updated settings to the store.
-        // - After saving, display a success message indicating that the settings were saved successfully.
+        const totalCategoryLimits = Object.values(categoryLimits).reduce((sum, limit) => sum + limit, 0);
 
-        // Instructions:
-        // - Check if the total expense exceeds the total budget limit.
-        // - If exceeded, set the budgetExceeded state to true and update the budget alert.
+        if (totalCategoryLimits > totalBudgetLimit) {
+            setError('Total category limits exceed the total budget limit.');
+            setBudgetExceeded(true);
+            return;
+        } else {
+            setError('');
+            setBudgetExceeded(false);
+        }
+
+        // Save settings to store
+        userSettingsStore.set({ ...userSettings, totalBudgetLimit, alertsEnabled, categoryLimits });
+        setSuccessMessage('Settings saved successfully!');
+    };
+
+    const handleCategoryLimitChange = (category, value) => {
+        setCategoryLimits((prev) => ({
+            ...prev,
+            [category]: value < 0 ? 0 : value // Prevent negative values
+        }));
     };
 
     return (
@@ -45,9 +67,8 @@ function Settings() {
             </Typography>
 
             <FormControlLabel
-                control={<Switch color="primary" />}
+                control={<Switch color="primary" checked={alertsEnabled} onChange={() => setAlertsEnabled(!alertsEnabled)} />}
                 label="Enable Alerts"
-                // Instructions: Add `checked` and `onChange` to control the `alertsEnabled` state
             />
 
             <Paper sx={{ padding: 2, mt: 2, boxShadow: 3, borderRadius: 2 }}>
@@ -57,9 +78,10 @@ function Settings() {
                     name="totalBudgetLimit"
                     fullWidth
                     margin="normal"
+                    value={totalBudgetLimit}
+                    onChange={(e) => setTotalBudgetLimit(parseFloat(e.target.value) || 0)}
                     inputProps={{ min: 0, step: '0.01' }}
                     sx={{ mt: 1 }}
-                    // Instructions: Bind the value and `onChange` to control the `totalBudgetLimit` state
                 />
             </Paper>
 
@@ -73,8 +95,9 @@ function Settings() {
                                 type="number"
                                 fullWidth
                                 margin="normal"
+                                value={categoryLimits[category] || 0}
+                                onChange={(e) => handleCategoryLimitChange(category, parseFloat(e.target.value) || 0)}
                                 inputProps={{ min: 0, step: '0.01' }}
-                                // Instructions: Bind value and `onChange` for each category's budget limit state
                             />
                         </Grid>
                     ))}
@@ -87,7 +110,7 @@ function Settings() {
                     color="primary"
                     fullWidth
                     sx={{ boxShadow: 2 }}
-                    // Instructions: Add `onClick` handler to save the settings by calling `handleSave`
+                    onClick={handleSave}
                 >
                     Save Settings
                 </Button>

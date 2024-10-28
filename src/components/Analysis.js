@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { transactionsStore } from '../stores/transactionStore';
 import {
@@ -10,7 +10,6 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
-    Button,
 } from '@mui/material';
 import {
     LineChart,
@@ -31,13 +30,56 @@ function Analysis() {
     const [timeFrame, setTimeFrame] = useState('monthly');
     const [reportType, setReportType] = useState('trend');
 
-    // Prepare the data for the trend analysis report based on the selected time frame (daily, weekly, monthly, yearly).
-    // Each object in the array should have the structure: { key, income, expense }
-    const trendData = []; // Replace with logic to group transactions by the selected time frame.
+    // Prepare the data for the trend analysis report based on the selected time frame
+    const [trendData, setTrendData] = useState([]);
+    const [budgetData, setBudgetData] = useState([]);
 
-    // Prepare the data for the budget vs actual report.
-    // Each object in the array should have the structure: { key, budget, actual }
-    const budgetData = []; // Replace with logic to compare the actual expenses against the budget.
+    // Use effect to calculate the trend data and budget data whenever transactions change
+    useEffect(() => {
+        // Calculate trend data
+        const groupedData = {};
+
+        transactions.forEach((transaction) => {
+            const date = new Date(transaction.date);
+            let key;
+
+            // Grouping logic based on time frame
+            if (timeFrame === 'daily') {
+                key = date.toLocaleDateString(); // e.g., "10/27/2024"
+            } else if (timeFrame === 'weekly') {
+                const week = `${date.getFullYear()}-W${getWeekNumber(date)}`;
+                key = week;
+            } else if (timeFrame === 'monthly') {
+                key = `${date.getFullYear()}-${date.getMonth() + 1}`; // e.g., "2024-10"
+            } else if (timeFrame === 'yearly') {
+                key = date.getFullYear(); // e.g., "2024"
+            }
+
+            if (!groupedData[key]) {
+                groupedData[key] = { key, income: 0, expense: 0 };
+            }
+
+            // Accumulate income and expense amounts
+            if (transaction.type === 'income') {
+                groupedData[key].income += transaction.amount;
+            } else if (transaction.type === 'expense') {
+                groupedData[key].expense += transaction.amount;
+            }
+        });
+
+        // Convert the grouped data to an array and sort it
+        const dataArray = Object.values(groupedData).sort((a, b) => new Date(a.key) - new Date(b.key));
+        setTrendData(dataArray);
+        
+        // Prepare budget vs actual data (Placeholder)
+        setBudgetData([{ key: 'Budget', budget: 500, actual: 400 }]); // Replace with actual budget data logic
+    }, [transactions, timeFrame]);
+
+    // Helper function to get the week number
+    const getWeekNumber = (d) => {
+        const oneJan = new Date(d.getFullYear(), 0, 1);
+        return Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+    };
 
     return (
         <Box sx={{ mt: 4, p: { xs: 2, md: 4 }, bgcolor: 'background.default' }}>
@@ -61,7 +103,8 @@ function Analysis() {
                             labelId="timeframe-select-label"
                             id="timeframe-select"
                             label="Time Frame"
-                            // Implement logic to update the time frame state
+                            value={timeFrame}
+                            onChange={(e) => setTimeFrame(e.target.value)} // Update time frame state
                         >
                             <MenuItem value="daily">Daily</MenuItem>
                             <MenuItem value="weekly">Weekly</MenuItem>
@@ -78,7 +121,8 @@ function Analysis() {
                             labelId="report-type-select-label"
                             id="report-type-select"
                             label="Report Type"
-                            // Implement logic to update the report type state
+                            value={reportType}
+                            onChange={(e) => setReportType(e.target.value)} // Update report type state
                         >
                             <MenuItem value="trend">Trend Analysis</MenuItem>
                             <MenuItem value="budget">Budget vs. Actual</MenuItem>
@@ -87,14 +131,11 @@ function Analysis() {
                 </Grid>
 
                 {/* Export Button */}
-                {/* Instructions:
-                    - Implement the ExportButton component with the appropriate data and headers.
-                    - The data and headers should be based on the selected report type. */}
                 <Grid item xs={12} sm={6} md={4}>
                     <ExportButton
-                        data={[]}
-                        filename={''}
-                        headers={['']}
+                        data={reportType === 'trend' ? trendData : budgetData} // Dynamic data based on selected report type
+                        filename={`report_${reportType}_${new Date().toISOString()}.csv`}
+                        headers={reportType === 'trend' ? ['Date', 'Income', 'Expense'] : ['Key', 'Budget', 'Actual']} // Dynamic headers
                     />
                 </Grid>
             </Grid>
@@ -102,7 +143,7 @@ function Analysis() {
             {/* Render the trend analysis chart if 'trend' is selected */}
             {reportType === 'trend' && (
                 <Grid container spacing={4}>
-                    <Grid item xs={12} md={12}>
+                    <Grid item xs={12}>
                         <Paper sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
                             <Typography variant="h6" gutterBottom color="text.secondary">
                                 Income and Expenses Trend
@@ -123,12 +164,28 @@ function Analysis() {
             )}
 
             {/* Render the budget vs actual expenses chart if 'budget' is selected */}
-            {/* Implement the Budget vs. Actual Expenses report
-                Instructions:
-                - Display a bar chart comparing the budgeted amounts to the actual expenses.
-                - Use the budgetData array to render the chart.
-            */}
-            
+            {reportType === 'budget' && (
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <Paper sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
+                            <Typography variant="h6" gutterBottom color="text.secondary">
+                                Budget vs Actual Expenses
+                            </Typography>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart data={budgetData}>
+                                    <XAxis dataKey="key" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="budget" fill="#82ca9d" name="Budget" />
+                                    <Bar dataKey="actual" fill="#8884d8" name="Actual" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            )}
+
             {/* Additional Analysis Sections */}
             <Grid container spacing={4} sx={{ mt: 4 }}>
                 <Grid item xs={12} md={6}>

@@ -15,13 +15,21 @@ function AlertBanner() {
     if (!alertsEnabled) return null;
 
     // Calculate the total expenses from the transaction data.
-    const totalExpenses = 0; // Replace with logic to calculate total expenses.
+    const totalExpenses = transactions.reduce((total, transaction) => total + transaction.amount, 0); // Assuming transaction has an 'amount' field
 
     // Check if the total expenses exceed the total budget limit.
-    const overTotalBudget = false; // Replace with logic to compare totalExpenses and totalBudgetLimit.
+    const overTotalBudget = totalExpenses > totalBudgetLimit;
 
     // Calculate expenses per category and check if any category limit has been exceeded.
-    const exceededCategories = []; // Replace with logic to check which categories exceeded their limits.
+    const expensesPerCategory = transactions.reduce((acc, transaction) => {
+        const category = transaction.category; // Assuming transaction has a 'category' field
+        acc[category] = (acc[category] || 0) + transaction.amount;
+        return acc;
+    }, {});
+
+    const exceededCategories = Object.entries(expensesPerCategory)
+        .filter(([category, expense]) => expense > (categoryLimits[category] || 0))
+        .map(([category]) => category);
 
     return (
         <div>

@@ -2,22 +2,39 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function MonthlyChart({ transactions }) {
-    // Instructions:
-    // - Group transactions by month.
-    // - For each month, calculate the total income and expense.
-    const dataMap = {}; // Implement logic to group transactions by month and calculate totals
+    // Group transactions by month.
+    const dataMap = {};
 
-    transactions.forEach((t) => {
-        // Instructions:
-        // - Extract the month and year from each transaction's date.
-        // - Check if the month is already in `dataMap`. If not, initialize it.
-        // - Accumulate the income and expense amounts based on the transaction type.
+    transactions.forEach((transaction) => {
+        const date = new Date(transaction.date); // Assuming transaction has a 'date' field
+        const month = date.toLocaleString('default', { month: 'long' }); // Get month name
+        const year = date.getFullYear(); // Get year
+
+        const monthYearKey = `${month} ${year}`; // Create a key for month and year
+
+        // Initialize the entry if it doesn't exist
+        if (!dataMap[monthYearKey]) {
+            dataMap[monthYearKey] = {
+                month: monthYearKey,
+                income: 0,
+                expense: 0,
+            };
+        }
+
+        // Accumulate the income and expense amounts based on the transaction type
+        if (transaction.type === 'income') {
+            dataMap[monthYearKey].income += transaction.amount; // Assuming transaction has an 'amount' field
+        } else if (transaction.type === 'expense') {
+            dataMap[monthYearKey].expense += transaction.amount;
+        }
     });
 
-    // Instructions:
-    // - Convert the data map into an array and sort it by date.
-    // - The array should contain objects with the following structure: { month, income, expense }
-    const data = []; // Implement logic to convert dataMap to a sorted array
+    // Convert the data map into an array and sort it by date
+    const data = Object.values(dataMap).sort((a, b) => {
+        const [monthA, yearA] = a.month.split(' ');
+        const [monthB, yearB] = b.month.split(' ');
+        return new Date(`${monthA} 1, ${yearA}`) - new Date(`${monthB} 1, ${yearB}`); // Sort by month and year
+    });
 
     return (
         <ResponsiveContainer width="100%" height={300}>

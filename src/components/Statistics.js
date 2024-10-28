@@ -1,50 +1,46 @@
 import React from 'react';
 import { useStore } from '@nanostores/react';
 import { transactionsStore } from '../stores/transactionStore';
-import { Paper, Typography } from '@mui/material';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+} from 'recharts';
 
-function Statistics() {
+function BalanceOverTime() {
     const transactions = useStore(transactionsStore);
 
-    // Filter transactions by 'expense' type
-    // Instructions:
-    // - Implement logic to filter the transactions array to only include expenses.
-    const expenses = []; // Replace with logic to filter expenses
+    // Sort transactions by date
+    const sortedTransactions = transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // Calculate total expense
-    // Instructions:
-    // - Sum the amounts of all expense transactions.
-    const totalExpense = 0; // Replace with logic to calculate total expense
+    // Calculate the cumulative balance
+    const data = [];
+    let cumulativeBalance = 0;
 
-    // Get unique dates from expenses
-    // Instructions:
-    // - Extract the unique dates from the expense transactions.
-    // - Calculate the average daily expense.
-    const uniqueDates = []; // Replace with logic to get unique dates
-    const averageDailyExpense = 0; // Replace with logic to calculate average daily expense
+    sortedTransactions.forEach((transaction) => {
+        // Assuming transaction has a date and amount field, and type (income or expense)
+        cumulativeBalance += transaction.type === 'income' ? transaction.amount : -transaction.amount;
 
-    // Find the category with the highest spending
-    // Instructions:
-    // - Use the categoryExpenses object to accumulate the total amount spent in each category.
-    // - Implement logic to determine which category has the highest total expense.
-    // - Ensure that `maxCategory` contains the category with the highest spending.
-    const categoryExpenses = {}; // Replace with logic to calculate expenses per category
-    let maxCategory = null;
+        // Push the date and cumulative balance into the data array
+        data.push({
+            date: transaction.date,
+            Balance: cumulativeBalance,
+        });
+    });
 
     return (
-        <Paper sx={{ padding: 2, mt: 2 }}>
-            <Typography variant="h6">Key Statistics</Typography>
-            <Typography>
-                Average Daily Expense: {averageDailyExpense.toFixed(2)} €
-            </Typography>
-            <Typography>
-                Highest Spending Category:{' '}
-                {maxCategory
-                    ? `${maxCategory} (${categoryExpenses[maxCategory].toFixed(2)} €)`
-                    : 'No data available'}
-            </Typography>
-        </Paper>
+        <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+                <XAxis dataKey="date" tickFormatter={(date) => new Date(date).toLocaleDateString()} />
+                <YAxis />
+                <Tooltip labelFormatter={(label) => new Date(label).toLocaleDateString()} />
+                <Line type="monotone" dataKey="Balance" stroke="#8884d8" />
+            </LineChart>
+        </ResponsiveContainer>
     );
 }
 
-export default Statistics;
+export default BalanceOverTime;
