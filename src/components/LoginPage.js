@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore, login } from '../stores/authStore';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
-import { useStore } from '@nanostores/react';
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-    
+    const [showCredentials, setShowCredentials] = useState(false); // New state for showing credentials
+
     const navigate = useNavigate();
 
     const handleLogin = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Debe ser la primera línea para prevenir el comportamiento predeterminado
+   
+    
 
         // Validación de campos
         if (!email || !password) {
@@ -32,6 +34,23 @@ function LoginPage() {
             setError('Invalid email or password.');
         }
     };
+
+    const handleForgotPassword = () => {
+
+        setShowCredentials(true); // Show credentials message
+    };
+    
+    const handleRegister = () => {
+        // Aquí puedes manejar el registro o redirigir a una página de registro
+        navigate('/register');
+        // Por ejemplo, puedes usar navigate('/register') si tienes una página de registro
+    }; 
+
+    const handleLoginForgot = () => { 
+        if( email === 'default@example.com ' && password === 'password123'  ) { 
+            navigate('/dashboard');
+        }
+    }
 
     return (
         <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8, p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
@@ -61,6 +80,7 @@ function LoginPage() {
                     color="primary"
                     fullWidth
                     sx={{ mt: 2 }}
+                    onClick={handleLoginForgot()}
                 >
                     Login
                 </Button>
@@ -74,8 +94,39 @@ function LoginPage() {
 
             {success && (
                 <Alert severity="success" sx={{ mt: 2 }}>
-                   Sign in {email} <br/>
-                   successfully! Redirecting...
+                    Sign in {email} <br />
+                    successfully! Redirecting...
+                </Alert>
+            )}
+
+            {error && (
+                <>
+                    <Button
+                        onClick={handleForgotPassword} // Corregido para pasar la referencia
+                        variant="outlined"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        Forgot Password?
+                    </Button>
+                    <Button
+                        onClick={handleRegister} // Corregido para pasar la referencia
+                        variant="outlined"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        Register
+                    </Button>
+                </>
+            )}
+
+            {showCredentials && (
+                <Alert severity="info" sx={{ mt: 2 }}>
+                    Default credentials:<br />
+                    Email: default@example.com<br />
+                    Password: password123
                 </Alert>
             )}
         </Box>

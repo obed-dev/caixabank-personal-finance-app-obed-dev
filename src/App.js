@@ -46,10 +46,10 @@ function App() {
           <Container>
             <Routes>
               <Route path="/" element={<ProtectedRoute />}>
-                <Route index element={<Dashboard />} />
-                <Route path="transactions" element={<TransactionList />} />
-                <Route path="analysis" element={<Analysis />} />
-                <Route path="settings" element={<Settings />} />
+                <Route path='/dashboard' element={<Dashboard />} />
+                <Route path="/transactions" element={<TransactionList />} />
+                <Route path="/analysis" element={<Analysis />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="/support" element={<SupportPage />} />
               </Route>
              

@@ -5,35 +5,30 @@ function ForgotPasswordPage() {
     const [email, setEmail] = useState(''); 
     const [message, setMessage] = useState(''); 
 
-    const handleSubmit = (e) => {
-        e.preventDefault(); 
+   
+         
 
         // Simulate sending a password recovery email.
-        // Instructions:
-        // - If the email matches 'user@example.com', display a success message.
-        // - If the email does not match, display an error message indicating the email is not found.
-    };
+       
+            // Display an error message with the default credentials.
+            setMessage(
+                       'Default credentials:\n' +
+                       'Email: default@example.com\n' +
+                       'Password: password123');
+        
+    
 
     return (
         <Box sx={{ mt: 8 }}>
             <Typography variant="h4" gutterBottom>
                 Forgot Password
             </Typography>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
-                    required
-                    sx={{ mb: 2 }}
-                />
-                <Button variant="contained" color="primary" type="submit">
-                    Send Reset Link
-                </Button>
-            </form>
-            {message && <Typography color="secondary" sx={{ mt: 2 }}>{message}</Typography>}
+            
+            {message && (
+                <Typography color="secondary" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+                    {message}
+                </Typography>
+            )}
         </Box>
     );
 }

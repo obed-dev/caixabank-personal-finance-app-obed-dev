@@ -36,7 +36,7 @@ function RegisterPage() {
         setSuccess(true);
 
         setTimeout(() => {
-            navigate('/');
+            navigate('/dashboard');
         }, 2000);
     };
 
