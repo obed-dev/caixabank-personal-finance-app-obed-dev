@@ -61,7 +61,7 @@ const darkTheme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-            main: '#90caf9', // Lighter blue for dark mode
+            main: '#ffffff', // Lighter blue for dark mode
         },
         secondary: {
             main: '#ff4081', // Secondary color in dark mode
@@ -101,6 +101,14 @@ const darkTheme = createTheme({
                 root: {
                     borderRadius: '16px',
                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
+                },
+            },
+        },
+        MuiDrawer: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: '#1e1e1e', // Dark background for Drawer
+                    color: '#ffffff', // White text color for links
                 },
             },
         },
