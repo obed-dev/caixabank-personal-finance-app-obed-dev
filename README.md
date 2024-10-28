@@ -29,8 +29,8 @@ This application was built with a powerful stack of modern web technologies:
   - [React] - JavaScript library for building user interfaces
   - [Material UI CSS] - Utility-first CSS framework for responsive design
   
-- **Backend**:
-  - [Firebase](https://firebase.google.com/) - Real-time data storage, user authentication, and hosting
+- **Testin**:
+  - [Jest ] - Unit testing integration.
 - **Other Tools**:
   - [Git](https://git-scm.com/) - Version control
   - [GitHub](https://github.com/) - Code hosting and collaboration
