@@ -1,54 +1,166 @@
-import React from 'react';
-import { transactionsStore, deleteTransaction } from '../stores/transactionStore';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
+import { transactionsStore, deleteTransaction as deleteTransactionAction } from '../stores/transactionStore'; 
+import TransactionForm from './TransactionForm';
 import {
-    List,
-    ListItem,
-    ListItemText,
-    ListItemSecondaryAction,
-    IconButton,
-    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Paper,
+    Button,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    Box,
+    Typography
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 
-const TransactionList = ({ onEdit }) => {
+function TransactionList() {
     const transactions = useStore(transactionsStore);
 
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterType, setFilterType] = useState('');
+    const [sortField, setSortField] = useState('');
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [transactionToEdit, setTransactionToEdit] = useState(null);
+    
+
+    // Implement delete functionality
+    const deleteTransaction = useCallback((id) => {
+        const isConfirmed = window.confirm('Are you sure do you want to delete this')
+
+        if (isConfirmed) {
+            deleteTransactionAction(id); // Ensure this function is defined in your transaction store
+        }
+            
+    }, []);
+
+    // Implement edit functionality
+    const handleEdit = useCallback((transaction) => {
+        setTransactionToEdit(transaction);
+        setIsFormOpen(true);
+    }, []);
+
+    // Handle adding a new transaction
+    const handleAddTransaction = () => {
+        setTransactionToEdit(null);
+        setIsFormOpen(true);
+    };
+
+    // Filter transactions based on category and type
+    const filteredTransactions = useMemo(() => {
+        return transactions.filter(transaction => {
+            const matchesCategory = filterCategory ? transaction.category === filterCategory : true;
+            const matchesType = filterType ? transaction.type === filterType : true;
+            return matchesCategory && matchesType;
+        });
+    }, [transactions, filterCategory, filterType]);
+
+    // Sort transactions
+    const sortedTransactions = useMemo(() => {
+        if (sortField) {
+            return [...filteredTransactions].sort((a, b) => (a[sortField] > b[sortField] ? 1 : -1));
+        }
+        return filteredTransactions;
+    }, [filteredTransactions, sortField]);
+
     return (
-        <Paper elevation={3} sx={{ padding: 2, maxWidth: 500, margin: 'auto' }}>
-            <Typography variant="h6" align="center" gutterBottom>
+        <Box sx={{ mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
                 Transaction List
             </Typography>
-            <List>
-                {transactions.map((transaction) => (
-                    <ListItem key={transaction.id} divider>
-                        <ListItemText
-                            primary={transaction.description}
-                            secondary={`Amount: $${transaction.amount}`}
-                        />
-                        <ListItemSecondaryAction>
-                            <IconButton
-                                edge="end"
-                                aria-label="edit"
-                                onClick={() => onEdit(transaction)}
-                            >
-                                <EditIcon color="primary" />
-                            </IconButton>
-                            <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => deleteTransaction(transaction.id)}
-                            >
-                                <DeleteIcon color="secondary" />
-                            </IconButton>
-                        </ListItemSecondaryAction>
-                    </ListItem>
-                ))}
-            </List>
-        </Paper>
+
+            {/* Add transaction button */}
+            <Button variant="contained" color="primary" onClick={handleAddTransaction}>
+                Add Transaction
+            </Button>
+
+            {/* Filters */}
+            <Box sx={{ display: 'flex', gap: 2, my: 2 }}>
+                <FormControl sx={{ minWidth: 120 }}>
+                    <InputLabel id="filter-category-label">Category</InputLabel>
+                    <Select
+                        labelId="filter-category-label"
+                        value={filterCategory}
+                        onChange={(e) => setFilterCategory(e.target.value)}
+                    >
+                        <MenuItem value="">All</MenuItem>
+                        {/* Add additional categories dynamically here */}
+                    </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: 120 }}>
+                    <InputLabel id="filter-type-label">Type</InputLabel>
+                    <Select
+                        labelId="filter-type-label"
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                    >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="income">Income</MenuItem>
+                        <MenuItem value="expense">Expense</MenuItem>
+                    </Select>
+                </FormControl>
+
+                <FormControl sx={{ minWidth: 150 }}>
+                    <InputLabel id="sort-field-label">Sort By</InputLabel>
+                    <Select
+                        labelId="sort-field-label"
+                        value={sortField}
+                        onChange={(e) => setSortField(e.target.value)}
+                    >
+                        <MenuItem value="">None</MenuItem>
+                        <MenuItem value="amount">Amount</MenuItem>
+                        <MenuItem value="date">Date</MenuItem>
+                    </Select>
+                </FormControl>
+            </Box>
+
+            {/* Table of transactions */}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Amount (€)</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Category</TableCell>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {sortedTransactions.map((transaction) => (
+                            <TableRow key={transaction.id}>
+                                <TableCell>{transaction.description}</TableCell>
+                                <TableCell>{transaction.amount.toFixed(2)}</TableCell>
+                                <TableCell>{transaction.type}</TableCell>
+                                <TableCell>{transaction.category}</TableCell>
+                                <TableCell>{transaction.date}</TableCell>
+                                <TableCell>
+                                    <Button variant="outlined" color="primary" onClick={() => handleEdit(transaction)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="outlined" color="error" onClick={() => deleteTransaction(transaction.id)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Transaction Form Dialog */}
+            {isFormOpen && (
+                <TransactionForm transactionToEdit={transactionToEdit} onClose={() => setIsFormOpen(false)} />
+            )}
+        </Box>
     );
-};
+}
 
 export default TransactionList;

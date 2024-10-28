@@ -2,6 +2,7 @@ import { atom } from 'nanostores';
 
 const initialTransactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
+
 export const transactionsStore = atom(initialTransactions);
 
 export const setTransactions = (transactions) => {
@@ -21,7 +22,7 @@ export const deleteTransaction = (id) => {
     setTransactions(updatedTransactions); 
 };
 
-// Nueva función para editar una transacción
+// New function to edit a transaction
 export const editTransaction = (updatedTransaction) => {
     const currentTransactions = transactionsStore.get();
     const updatedTransactions = currentTransactions.map(transaction =>

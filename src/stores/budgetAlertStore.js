@@ -1,25 +1,34 @@
 import { atom } from 'nanostores';
 
-export const budgetAlertStore = atom({
-    isVisible: false,          
-    message: '',               
-    notificationCount: 0,      
+export const budgetStore = atom({
+    budget: 0,          // total budget
+    totalSpent: 0,      // Total expense
 });
 
-export const updateBudgetAlert = (message) => {
-    budgetAlertStore.set({
-        isVisible: true, 
-        message: message, 
-        notificationCount: budgetAlertStore.get().notificationCount + 1,
-    });
+// Set a new budget
+export const setBudget = (amount) => {
+    budgetStore.set((current) => ({
+        ...current,
+        budget: amount,
+    }));
 };
 
-export const resetBudgetAlert = () => {
-    budgetAlertStore.set({
-        isVisible: false,
-        message: '',
-        notificationCount: 0
-    });
+// Add an amount to the total spent
+export const addToSpent = (amount) => {
+    budgetStore.set((current) => ({
+        ...current,
+        totalSpent: current.totalSpent + amount,
+    }));
 };
 
-export const getBudgetAlertState = () => budgetAlertStore.get();
+// Reset total spent to zero
+export const resetSpent = () => {
+    budgetStore.set((current) => ({
+        ...current,
+        totalSpent: 0,
+    }));
+};
+
+// Get the current budget status
+export const getBudgetState = () => budgetStore.get();
+
