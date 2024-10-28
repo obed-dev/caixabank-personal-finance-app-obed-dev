@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge, Avatar, Typography } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge, Avatar, Typography, useMediaQuery } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { Link } from 'react-router-dom';
+import { useStore } from '@nanostores/react';
+import { authStore, logout } from '../stores/authStore';
+import { Link, useNavigate } from 'react-router-dom';
 
-const Navbar = ({ toggleTheme, isDarkMode, user, onLogout }) => {
+const Navbar = ({ isAuthenticated, user, onLogout }) => {
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const navigate = useNavigate();
+    const isMobile = useMediaQuery('(max-width:600px)'); // Check if device is mobile
 
     const toggleDrawer = (open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -14,76 +18,111 @@ const Navbar = ({ toggleTheme, isDarkMode, user, onLogout }) => {
         setDrawerOpen(open);
     };
 
+    const auth = useStore(authStore);
+    
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <>
             <AppBar position="static">
                 <Toolbar>
-                    <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)}>
-                        <MenuIcon />
-                    </IconButton>
+                    {isMobile && (
+                        <IconButton edge="start" aria-label="menu" onClick={toggleDrawer(true)}>
+                            <MenuIcon />
+                        </IconButton>
+                    )}
 
-                    {/* Navigation links */}
-                    <Box sx={{ flexGrow: 1 }}>
-                        {user ? (
-                            <Box sx={{ display: 'flex', alignItems: 'left' }}>
-                                <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
-                                    Dashboard
-                                </Link>
-                                <Link to="/settings" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
-                                    Settings
-                                </Link>
-                                <Button color="inherit" onClick={onLogout}>Logout</Button>
-                                {/* User avatar */}
-                                <IconButton>
-                                    <Avatar alt={user.email} src={user.avatar} />
-                                </IconButton>
-                            </Box>
-                        ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Link to="/login" style={{ textDecoration: 'none', color: 'inherit', marginRight: 20 }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                        {!auth.isAuthenticated ? (
+                            <>
+                                <Link to="/login" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
                                     Login
                                 </Link>
                                 <Link to="/register" style={{ textDecoration: 'none', color: 'inherit' }}>
                                     Register
                                 </Link>
-                            </Box>
+                            </>
+                        ) : (
+                            <>
+                                {!isMobile && (
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
+                                        <Link to="/" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                            Home
+                                        </Link>
+                                        <Link to="/transactions" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                            Transactions
+                                        </Link>
+                                        <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                            Analysis
+                                        </Link>
+                                        <Link to="/settings" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                            Settings
+                                        </Link>
+                                        <Link to="/support" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
+                                            Support
+                                        </Link>
+                                    </Box>
+                                )}
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+                                    <IconButton color="inherit">
+                                        <Badge color="error" variant="dot">
+                                            <NotificationsIcon />
+                                        </Badge>
+                                    </IconButton>
+                                    {/* <Avatar alt={user.email} src={user.avatar} sx={{ marginLeft: 2 }} /> */}
+                                    {/* <Typography variant="body2" sx={{ marginLeft: 1 }}>
+                                        {user.email}
+                                    </Typography> */}
+                                    <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 2 }}>
+                                        Sign Out
+                                    </Button>
+                                </Box>
+                            </>
                         )}
-                        <IconButton>
-                            <Badge color="error" variant="dot">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
                     </Box>
                 </Toolbar>
             </AppBar>
 
+            {/* Burger menu for mobile view */}
             <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-                <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
-                    {/* Drawer navigation links */}
-                    {user ? (
-                        <Box sx={{ padding: 2 }}>
-                            <Typography variant="h6">Navigation</Typography>
-                            <Link to="/dashboard" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
-                                Dashboard
-                            </Link>
-                            <Link to="/transactions" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
-                                Transactions
-                            </Link>
-                            <Link to="/settings" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
-                                Settings
-                            </Link>
-                        </Box>
-                    ) : (
-                        <Box sx={{ padding: 2 }}>
-                            <Typography variant="h6">Navigation</Typography>
-                            <Link to="/login" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
-                                Login
-                            </Link>
-                            <Link to="/register" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
-                                Register
-                            </Link>
-                        </Box>
-                    )}
+                <Box role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)} sx={{ width: 250 }}>
+                    <Box sx={{ padding: 2 }}>
+                      
+                        {!auth.isAuthenticated ? (
+                            <>
+                                <Link to="/login" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Login
+                                </Link>
+                                <Link to="/register" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Register
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Home
+                                </Link>
+                                <Link to="/transactions" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Transactions
+                                </Link>
+                                <Link to="/analysis" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Analysis
+                                </Link>
+                                <Link to="/settings" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Settings
+                                </Link>
+                                <Link to="/support" style={{ display: 'block', textDecoration: 'none', margin: '8px 0' }}>
+                                    Support
+                                </Link>
+                                
+                            </>
+                        )}
+                    </Box>
                 </Box>
             </Drawer>
         </>

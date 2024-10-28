@@ -1,50 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../stores/authStore';
-import {
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Alert,
-    Grid
-} from '@mui/material';
+import { authStore, login } from '../stores/authStore';
+import { Box, Button, TextField, Typography, Alert } from '@mui/material';
+import { useStore } from '@nanostores/react';
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [showCredentials, setShowCredentials] = useState(false);
+    const [success, setSuccess] = useState(false);
+    
     const navigate = useNavigate();
-
-    const defaultCredentials = {
-        email: 'default@example.com',
-        password: 'password123'
-    };
 
     const handleLogin = (e) => {
         e.preventDefault();
 
-        // Validate that fields are not empty
-        // Instructions:
-        // - Check if the email and password fields are filled.
+        // Validación de campos
         if (!email || !password) {
-            // - If either is empty, set an appropriate error message.
+            setError('Please fill in both fields.');
             return;
         }
 
-        // Validate credentials
-        // Instructions:
-        // - Check if the entered credentials match the default credentials or the stored user credentials.
-        // - If valid, call the `login` function and navigate to the homepage.
-        // - If invalid, set an error message.
-    };
-
-    const handleShowDefaultCredentials = () => {
-        // Show default credentials in case the user requests it
-        setEmail(defaultCredentials.email);
-        setPassword(defaultCredentials.password);
-        setShowCredentials(true);
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (storedUser && storedUser.email === email && storedUser.password === password) {
+            login(storedUser);
+            setSuccess(true);
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+        } else {
+            setError('Invalid email or password.');
+        }
     };
 
     return (
@@ -80,14 +66,16 @@ function LoginPage() {
                 </Button>
             </form>
 
-            {/* Show error message when applicable */}
-            {/* - Use the Alert component to display the error message if one exists. */}
-            {/* - Ensure that registration and forgot password options are displayed below the error message if present. */}
+            {error && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    {error}
+                </Alert>
+            )}
 
-            {showCredentials && (
-                <Alert severity="info" sx={{ mt: 2 }}>
-                    <strong>Email:</strong> {defaultCredentials.email}<br />
-                    <strong>Password:</strong> {defaultCredentials.password}
+            {success && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                   Sign in {email} <br/>
+                   successfully! Redirecting...
                 </Alert>
             )}
         </Box>

@@ -14,28 +14,27 @@ function RegisterPage() {
     const handleRegister = (e) => {
         e.preventDefault();
 
-        // Instructions:
+        if (!email || !password || !confirmPassword) {
+            setError('All fields are required.');
+            return;
+        }
 
-        // Validate that all fields (email, password, confirmPassword) are filled.
-        // - If any field is empty, display an error message.
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
 
-        // Check if the passwords match.
-        // - If the passwords do not match, set an appropriate error message.
+        const existingUser = JSON.parse(localStorage.getItem('user'));
+        if (existingUser && existingUser.email === email) {
+            setError('This email is already registered.');
+            return;
+        }
 
-        // Check if the email is already registered in localStorage.
-        // - Retrieve the existing user from localStorage and verify if the entered email already exists.
-        // - If the email exists, set an error message.
-
-        // Save the new user's data to localStorage.
-        // - If validation passes, store the new user's email and password in localStorage.
-
-        // Automatically log the user in after successful registration.
-        // - Call the `login` function to set the authenticated user in the store.
-
-        // Redirect the user to the dashboard.
-        // - After successful registration and login, redirect the user to the home/dashboard page.
-
+        const newUser = { email, password };
+        localStorage.setItem('user', JSON.stringify(newUser));
+        login(newUser);  // Auto-login after registration
         setSuccess(true);
+
         setTimeout(() => {
             navigate('/');
         }, 2000);
@@ -51,32 +50,26 @@ function RegisterPage() {
                     label="Email"
                     type="email"
                     value={email}
-                    name="email"
                     onChange={(e) => setEmail(e.target.value)}
                     fullWidth
                     margin="normal"
                 />
-
                 <TextField
                     label="Password"
                     type="password"
                     value={password}
-                    name="password"
                     onChange={(e) => setPassword(e.target.value)}
                     fullWidth
                     margin="normal"
                 />
-
                 <TextField
                     label="Confirm Password"
                     type="password"
                     value={confirmPassword}
-                    name="confirmPassword"
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     fullWidth
                     margin="normal"
                 />
-
                 <Button
                     type="submit"
                     variant="contained"
@@ -96,7 +89,8 @@ function RegisterPage() {
 
             {success && (
                 <Alert severity="success" sx={{ mt: 2 }}>
-                    Account created successfully! Redirecting to login...
+                    Account with the email {email} <br/> 
+                    created successfully! Redirecting...
                 </Alert>
             )}
         </Box>
