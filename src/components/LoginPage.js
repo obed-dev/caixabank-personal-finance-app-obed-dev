@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authStore, login } from '../stores/authStore';
+import { login } from '../stores/authStore';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
 
 function LoginPage() {
@@ -8,27 +8,28 @@ function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-    const [showCredentials, setShowCredentials] = useState(false); // New state for showing credentials
+    const [showCredentials, setShowCredentials] = useState(false);
 
     const navigate = useNavigate();
 
     const handleLogin = (e) => {
         e.preventDefault(); 
-   
-    
 
-      
         if (!email || !password) {
             setError('Please fill in both fields.');
             return;
         }
 
         const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser && storedUser.email === email && storedUser.password === password) {
-            login(storedUser);
+        
+        // Check if the entered credentials match the default credentials
+        if ((email === 'default@example.com' && password === 'password123') || 
+            (storedUser && storedUser.email === email && storedUser.password === password)) {
+            const userToLogin = storedUser || { email, password }; // If using default credentials, create user object
+            login(userToLogin);
             setSuccess(true);
             setTimeout(() => {
-                navigate('/');
+                navigate('/dashboard');
             }, 2000);
         } else {
             setError('Invalid email or password.');
@@ -36,21 +37,12 @@ function LoginPage() {
     };
 
     const handleForgotPassword = () => {
-
-        setShowCredentials(true); // Show credentials message
+        setShowCredentials(true);
     };
     
     const handleRegister = () => {
-      
         navigate('/register');
-      
-    }; 
-
-    const handleLoginForgot = () => { 
-        if( email === 'default@example.com ' && password === 'password123'  ) { 
-            navigate('/dashboard');
-        }
-    }
+    };
 
     return (
         <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8, p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
@@ -80,7 +72,6 @@ function LoginPage() {
                     color="primary"
                     fullWidth
                     sx={{ mt: 2 }}
-                    onClick={handleLoginForgot()}
                 >
                     Login
                 </Button>
