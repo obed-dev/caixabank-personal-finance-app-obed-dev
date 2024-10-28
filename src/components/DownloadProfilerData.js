@@ -3,10 +3,10 @@ import { Button } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 
-function DownloadProfilerData({ profilerData }) {
+function DownloadProfilerData({ profilerData = [] }) {
     // Handle download functionality
     const handleDownload = () => {
-        if (profilerData.length === 0) {
+        if (!profilerData || profilerData.length === 0) {
             // Alert the user that there is nothing to download
             alert('No profiler data available for download.');
             return;
