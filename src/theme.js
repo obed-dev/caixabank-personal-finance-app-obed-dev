@@ -2,6 +2,12 @@
 
 import { createTheme } from '@mui/material/styles';
 
+
+
+
+
+
+
 // Light Theme
 const lightTheme = createTheme({
     palette: {
@@ -20,6 +26,7 @@ const lightTheme = createTheme({
             primary: '#333333', // Dark text
             secondary: '#777777', // Lighter gray text
         },
+        
     },
     typography: {
         fontFamily: 'Arial, sans-serif',

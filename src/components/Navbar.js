@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge, Avatar, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Drawer, Box, Button, Badge, Avatar, Typography, useMediaQuery  } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useStore } from '@nanostores/react';
@@ -25,6 +25,9 @@ const Navbar = ({ isAuthenticated, user, onLogout }) => {
         logout();
         navigate('/login');
     };
+    
+     
+    
 
     return (
         <>
@@ -74,10 +77,12 @@ const Navbar = ({ isAuthenticated, user, onLogout }) => {
                                             <NotificationsIcon />
                                         </Badge>
                                     </IconButton>
-                                    {/* <Avatar alt={user.email} src={user.avatar} sx={{ marginLeft: 2 }} /> */}
-                                    {/* <Typography variant="body2" sx={{ marginLeft: 1 }}>
-                                        {user.email}
-                                    </Typography> */}
+                                    
+                                    
+                                 
+            
+                             {/* Display the user's email */}
+                          
                                     <Button color="inherit" onClick={handleLogout} sx={{ marginLeft: 2 }}>
                                         Sign Out
                                     </Button>

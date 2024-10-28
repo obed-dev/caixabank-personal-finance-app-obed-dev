@@ -30,7 +30,7 @@ function RegisterPage() {
             return;
         }
 
-        const newUser = { email, password };
+        const newUser = { email  };
         localStorage.setItem('user', JSON.stringify(newUser));
         login(newUser);  // Auto-login after registration
         setSuccess(true);
