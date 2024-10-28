@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { userSettingsStore } from '../stores/userSettingsStore';
-import { budgetStore, setBudget } from '../stores/budgetAlertStore'; // Importar el store de alertas
+
 import {
     Box,
     Typography,
@@ -14,11 +14,11 @@ import {
     Alert,
 } from '@mui/material';
 import { expenseCategories } from '../constants/categories';
-import { transactionsStore } from '../stores/transactionStore';
+
 
 function Settings() {
     const userSettings = useStore(userSettingsStore);
-    const transactions = useStore(transactionsStore);
+    
 
     const [alertsEnabled, setAlertsEnabled] = useState(userSettings.alertsEnabled);
     const [budgetExceeded, setBudgetExceeded] = useState(false);

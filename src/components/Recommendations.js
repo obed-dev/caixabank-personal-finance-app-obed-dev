@@ -16,6 +16,7 @@ function Recommendations() {
             // Uncomment the next line to simulate an error
             // setError("Failed to load transactions.");
             setLoading(false);
+            setError(null);
         }, 1000);
     }, []);
 

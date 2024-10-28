@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback , useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import ExportButton from './ExportButton'; 
 import DownloadProfilerData from './DownloadProfilerData';
@@ -31,6 +31,25 @@ function TransactionList() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [transactionToEdit, setTransactionToEdit] = useState(null);
     
+
+
+// Profiling: capture load time data when transactions load
+useEffect(() => {
+    const startTime = performance.now();
+    
+    // Simulate data processing delay
+    setTimeout(() => {
+        const endTime = performance.now();
+        const loadTime = (endTime - startTime).toFixed(2);
+        setProfilerData((prevData) => [
+            ...prevData,
+            { timestamp: new Date().toLocaleString(), loadTime }
+        ]);
+    }, 100); // Adjust delay as needed for profiling simulation
+}, [transactions]);
+
+
+
 
     // Implement delete functionality
     const deleteTransaction = useCallback((id) => {
@@ -97,7 +116,7 @@ function TransactionList() {
                     label="Export Transactions"
                 />
             )}
-                        {profilerData.length > 0 && (
+                         {profilerData.length > 0 && (
                 <DownloadProfilerData profilerData={profilerData} />
             )}
             

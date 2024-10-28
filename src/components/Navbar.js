@@ -53,7 +53,7 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
                     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                     {auth.isAuthenticated ? (  // Mostrar solo si el usuario está autenticado
         !isMobile && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 1  }}>
                 <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: 16 }}>
                     Home
                 </Link>
