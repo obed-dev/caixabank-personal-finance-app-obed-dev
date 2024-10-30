@@ -55,6 +55,12 @@ npm start
 
 Visit http://localhost:3000 to explore the app.
 
+## Pictures
+
+
+
+
+
 🌟 Contributing
 Contributions are welcome! Feel free to open issues or submit pull requests for any improvements or new features.
 
